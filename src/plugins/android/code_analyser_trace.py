@@ -92,6 +92,7 @@ class CodeTrace:
             was satisfied, and a dictionary object of updated links
         """
         logging.debug('Performing code trace.')
+        print("fn_perform_code_trace")
         # Androguard variables for this APK.
         self.androguard_apk_obj = a
         self.androguard_d_array = d
@@ -152,6 +153,7 @@ class CodeTrace:
         return [bool_satisfied, self.current_links]
         
     def fn_process_individual_trace_list_item(self, trace_dictionary):
+        print("fn_process_individual_trace_list_item")
         """Processes an individual trace object.
         
         :param trace_dictionary: dictionary object containing details of an
@@ -194,6 +196,7 @@ class CodeTrace:
         return bool_satisfied
 
     def fn_get_trace_parameters(self, trace_template):
+        print("fn_get_trace_parameters")
         """Sets trace parameters based on trace template.
         
         :param trace_template: dictionary object corresponding to a single
@@ -223,6 +226,7 @@ class CodeTrace:
             self.trace_type = TRACE_TYPE_BASIC
 
     def fn_enumerate_trace_source_sinks(self, trace_template):
+        print("fn_enumerate_trace_source_sinks")
         """Enumerates the (list of) trace start and end points from template.
         
         :param trace_template: dictionary object corresponding to a single 
@@ -234,6 +238,10 @@ class CodeTrace:
         trace_from_string = trace_template['TRACEFROM']        
         if ' OR ' in trace_from_string:
             trace_from_string_list = trace_from_string.split(' OR ')
+        elif ' WITH ' in trace_from_string:
+            print(trace_from_string)
+            trace_from_string_list = self.fn_determine_class_method_desc_with(trace_from_string)
+            print(trace_from_string_list)
         else:
             trace_from_string_list = [trace_from_string]
         # Get the end points.
@@ -245,6 +253,7 @@ class CodeTrace:
         return [trace_from_string_list, trace_to_string_list]
                 
     def fn_trace_through_code(self, trace_from_string, trace_to_string):
+        print("fn_trace_through_code")
         """Begins the actual trace.
         
         :param trace_from_string: string corresponding to a single start point
@@ -266,6 +275,9 @@ class CodeTrace:
             trace_to_string,
             self.to_class_method
         )
+        print("trace_from_list")
+        print(trace_from_list)
+
         if ((trace_from_list == []) or (trace_to_list == [])):
             logging.debug('Either TraceFrom or TraceTo evaluated to None.')
             return False
@@ -274,6 +286,7 @@ class CodeTrace:
         return self.fn_trace_handler(trace_from_list)
         
     def fn_get_trace_type(self, string):
+        print("fn_get_trace_type")
         """Gets trace starting point type.
         
         :param string: string containing trace start point type (either 
@@ -292,6 +305,7 @@ class CodeTrace:
         return [trace_type, string]
 
     def fn_get_trace_items(self, string, trace_type):
+        print("fn_get_trace_items")
         """Gets the actual strings to use as start/end points of trace.
         
         :param string: the string specified within the template
@@ -353,7 +367,89 @@ class CodeTrace:
             output_items = [string]
         return output_items
 
+    def fn_trace_with_handler(self, trace_with_stmt):
+        print("fn_trace_with_handler")
+        trace_from_arr = trace_from.split(' WITH ')
+        [class_part, method_part, desc_part] = \
+            self.inst_analysis_utils.fn_get_class_method_desc_from_string(
+                trace_from_arr[0]
+            )
+        list_of_methods = [("%s->%s%s" % (x.get_class_name(), x.get_name(), x.get_descriptor())) for x in self.inst_analysis_utils.fn_get_calls_from_method(class_part, method_part, desc_part)]
+
+
+
+    def fn_determine_class_method_desc_with(self, trace_from_string):
+        '''
+            Find a common class that contains both interest method call
+        '''
+        arr = []
+        print("fn_determine_class_method_desc_with")
+        [from_class_method, trace_from_string] = \
+            self.fn_get_trace_type(trace_from_string)
+        # Get any linked items.
+        trace_from_list = self.fn_get_trace_items(
+            trace_from_string,
+            from_class_method
+        )
+        print(trace_from_list)
+        trace_from_arr = trace_from_list[0].split(' WITH ')
+        arr.extend(trace_from_arr)
+        interest_method_1 = trace_from_arr[0]
+        interest_method_2 = trace_from_arr[1]
+        [class_part_1, method_part_1, desc_part_1] = \
+            self.inst_analysis_utils.fn_get_class_method_desc_from_string(
+                interest_method_1
+            )
+        print("%s->%s%s" % (class_part_1, method_part_1, desc_part_1))
+        [class_part_2, method_part_2, desc_part_2] = \
+            self.inst_analysis_utils.fn_get_class_method_desc_from_string(
+                interest_method_2
+            )
+        list_of_methods_that_call_method_of_interest_1 = []
+        list_of_methods_that_call_method_of_interest_1.extend(self.inst_analysis_utils.fn_get_calls_to_method(class_part_1, method_part_1, desc_part_1))
+        found = False
+        while len(list_of_methods_that_call_method_of_interest_1) > 0:
+            method = list_of_methods_that_call_method_of_interest_1.pop()
+            [inner_class, inner_method, inner_desc] = \
+                self.inst_analysis_utils.fn_get_class_method_desc_from_method(method)
+            print("inner class: %s->%s%s" % (inner_class, inner_method, inner_desc))
+            [found, found_class, found_method, found_desc] = self.custom_check_recursively_within_method(method, class_part_2, method_part_2, desc_part_2)
+            if found == True:
+                arr.append(("%s->%s%s" % (inner_class, inner_method, inner_desc)))
+            if self.custom_check_should_stop(inner_class) == False:
+                list_of_methods_that_call_method_of_interest_1.extend(self.inst_analysis_utils.fn_get_calls_to_method(inner_class, inner_method, inner_desc))
+        print("end")
+        return arr
+
+    def custom_check_should_stop(self, interest_class):
+        if interest_class.startswith('Landroid') or interest_class.startswith('Ljava') or interest_class.startswith('Lcom/google/android'):
+            return True
+        else:
+            return False
+    
+    def custom_check_recursively_within_method(self, method, interest_class, interest_method, interest_desc, loop=0):
+        returnVal = [False, None, None, None]
+        [class_part, method_part, desc_part] = \
+            self.inst_analysis_utils.fn_get_class_method_desc_from_method(method)
+        print("%d:custom_check_recursive:%s->%s%s" % (loop, class_part, method_part, desc_part))
+        if class_part == interest_class and method_part == interest_method and desc_part == interest_desc:
+            print("custom_check_recusrive:found")
+            return [True, class_part, method_part, desc_part]
+        elif self.custom_check_should_stop(class_part):
+            return [False, None, None, None]
+        else:
+            loop += 1
+            # explore even deeper
+            for m in self.inst_analysis_utils.fn_get_calls_from_method(class_part, method_part, desc_part):
+                returnVal = self.custom_check_recursively_within_method(m, interest_class, interest_method, interest_desc, loop)
+                if returnVal[0] == True:
+                    return [True, returnVal[1], returnVal[2], returnVal[3]]
+        return returnVal
+
+
+
     def fn_trace_handler(self, trace_from_list):
+        print("fn_trace_handler")
         """Starts the trace process and outputs the result.
         
         :param trace_from_list: list containing possible start points
@@ -361,17 +457,26 @@ class CodeTrace:
         :returns: boolean indicating whether at least one path was identified
             between the start and end points
         """
+
+        print("code_analyser_trace:fn_trace_handler")
+
+        print(trace_from_list)
+
+        print(self.from_class_method)
+
         for trace_from in trace_from_list:
+            print("fn_trace_handler:for loop 1")
+            print(trace_from)
+
             self.checked_methods = set()
             # Set a stop condition.
             self.stop_condition = STOP_CONDITION_FALSE
             
-            # Get class/method/desc parts.
             [class_part, method_part, desc_part] = \
-                self.fn_determine_class_method_desc(
-                    trace_from,
-                    self.from_class_method
-                )
+                    self.fn_determine_class_method_desc(
+                        trace_from,
+                        self.from_class_method
+                    )
             # Start the forward or reverse tracers, based on template.
             if self.trace_direction == TRACE_REVERSE:
                 self.fn_trace_reverse(
@@ -390,12 +495,19 @@ class CodeTrace:
         # If the output chain list is not empty, it means at least one path
         #  between the start and end points was identified.
         if self.output_chains != []:
+            print("There is something ...")
+            print(self.output_chains)
             return True
         else:
             return False
+
+    def fn_trace_reverse_with(self, class_part, method_part, desc_part, with_part):
+        pass
+
     
     def fn_trace_reverse(self, class_part, method_part, desc_part,
                          trace_chain=''):
+        print("fn_trace_reverse")
         """Performs the reverse tracing function.
         
         Reverse tracing starts from TRACEFROM and gets all xref_from at each 
@@ -407,6 +519,8 @@ class CodeTrace:
         :param desc_part: string denoting descriptor part of trace start point
         :param trace_chain: string denoting ordered trace chain
         """
+        print("tracechain: ", end="")
+        print(trace_chain)
         # Get starting points.
         starting_points = \
             self.inst_analysis_utils.fn_get_calls_to_method(
@@ -427,6 +541,8 @@ class CodeTrace:
                     desc_part
                 )
             )
+
+        # from here, it has a iterate finish all subclasses
 
         # We want to also add the original method to the search as it might not be directly called, for example OnCreate.
         if desc_part != '.':
@@ -491,6 +607,7 @@ class CodeTrace:
 
     def fn_handle_special_case_reverse(self, class_part, method_part,
                                        desc_part):
+        print("fn_handle_special_case_reverse")
         """Handles cases such as AsyncTask, where no direct link can be made.
         
         :param class_part: string name for class
@@ -511,6 +628,7 @@ class CodeTrace:
         
     def fn_trace_forward(self, class_part, method_part, desc_part,
                          trace_chain=''):
+        print("fn_trace_forward")
         """Performs the forward tracing function.
         
         Forward tracing starts from TRACEFROM and gets all xref_to at each 
@@ -576,6 +694,7 @@ class CodeTrace:
                 )
     
     def fn_handle_special_case_forward(self, method_descriptor):
+        print("fn_handle_special_case_forward")
         """Handle special cases, such as AsyncTask, in forward traces.
         
         :param method_descriptor: string denoting combined method and 
@@ -586,6 +705,7 @@ class CodeTrace:
         
     def fn_analyse_trace_point(self, class_part, method_part, desc_part,
                                trace_chain):
+        print("fn_analyse_trace_point")
         """Checks current trace point against stop condition; else continues.
 
         :param class_part: string denoting class part of current trace point
@@ -594,6 +714,11 @@ class CodeTrace:
         :param trace_chain: string denoting ordered trace chain
         """
         compound_name = class_part + '->' + method_part + desc_part
+        print("compound_name: ", end="")
+        print(compound_name)
+        print("checked_methods: ", end="")
+        print(self.checked_methods)
+        print("trace_chains: ", end="")
         if compound_name.startswith('Landroid') or compound_name.startswith('Ljava') or compound_name.startswith('Lcom/google/android'):
             return
         if compound_name in self.checked_methods:
@@ -664,6 +789,9 @@ class CodeTrace:
         )
 
     def fn_check_stop_condition(self, check_value):
+        print("fn_check_stop_condition")
+        print("check value:", end="")
+        print(check_value)
         """Checks whether the stop condition has been satisfied for the trace.
         
         This does not return a value, but rather sets a variable to a pre-defined
@@ -671,6 +799,7 @@ class CodeTrace:
         
         :param check_value: string value to be checked against stop condition
         """
+        print(self.to_class_method)
         if self.to_class_method == '<class>':
             check_value = check_value.split('->')[0]
         if check_value in self.trace_to_list:
@@ -719,6 +848,7 @@ class CodeTrace:
             (either "<class>" or "<method>")
         :returns: list containing class, method, descriptor parts
         """
+        print("fn_determine_class_method_desc")
         [class_part, method_part, desc_part] = \
             self.inst_analysis_utils.fn_get_class_method_desc_from_string(
                 trace_from
@@ -731,6 +861,7 @@ class CodeTrace:
         return [class_part, method_part, desc_part]
 
     def fn_analyse_returns(self, trace_template):
+        print("fn_analyse_returns")
         """Analyses the return object and appends items to returns list.
         
         :param trace_template: dictionary object containing RETURN element

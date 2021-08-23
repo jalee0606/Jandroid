@@ -296,6 +296,7 @@ class GraphHelperWorker:
         :returns: a list containing a list of node objects and a list of 
             relationship objects
         """
+        print("fn_get_nodes_from_tracepath")
         # Initialise lists to hold the nodes and relationships.
         individual_nodes = []
         chain_relationships = []
@@ -311,6 +312,7 @@ class GraphHelperWorker:
                     node_element.strip(),
                     node_properties
                 )
+                print(node_object)
                 # If it is the first or last node, then add a label to
                 #  denote this.
                 # First node in chain.

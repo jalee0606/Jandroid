@@ -1,6 +1,7 @@
 import os
 import logging
 import platform
+from common import JandroidException
 
 
 class RequirementsChecker:

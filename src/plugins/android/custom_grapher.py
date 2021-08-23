@@ -177,6 +177,7 @@ class CustomGrapher:
         self.fn_add_basic_to_trace_edges()
     
     def fn_add_basic_nodes(self, analysis_output):
+        print("fn_add_basic_nodes")
         """Adds nodes corresponding to apps that satisfy at least one bug.
         
         :param analysis_output: dictionary object containing the output of 
@@ -219,7 +220,8 @@ class CustomGrapher:
             # Give the nodes some short display name (like "App0", "App1").
             # The actual names are too long to be displayed properly.
             self.app_ids[individual_app] = 'App' + format_string.format(app_counter)
-            
+            print("app: ", end="")
+            print(individual_app)
             # Create a node object in vis.js style.
             node_object = {
                 'id': individual_app,
@@ -381,6 +383,9 @@ class CustomGrapher:
                 
             if vis_node_object == {}:
                 continue
+            # update the label here
+            vis_node_object['shape'] = "dot"
+            vis_node_object['label'] = vis_node_object['title']
             # Add the node object to the list of node objects.
             self.nodes.append(vis_node_object)
         

@@ -1,0 +1,81 @@
+
+----------------------------
+           JANDROID
+----------------------------
+
+INFO     Creating template object.
+INFO     1 potential template(s) found.
+INFO     Initiating Android analysis.
+INFO     Performing basic checks. Please wait.
+INFO     Basic checks complete.
+INFO     Beginning analysis...
+INFO     Analysing app-debug.apk in worker thread 0.
+INFO     Finished analysing apps.
+INFO     Creating custom graph.
+INFO     Custom graph can be found at C:\Users\cynte\Documents\GitHub\Jandroid\output\graph\jandroid.html
+INFO     All done.
+All lookfor elements were satisfied
+All lookfor elements were satisfied
+{'@activity_name': 'Ljalee/tech/webview/WebViewActivity;'}
+{'@scheme': 'http'}
+All lookfor elements were satisfied
+All lookfor elements were satisfied
+{'@activity_name': 'Ljalee/tech/webview/WebViewActivity2;'}
+{'@scheme': 'https'}
+fn_analyse_returns
+<method> AS @web_view
+['<method> AS @web_view']
+<method>
+@web_view
+Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object; Landroid/webkit/WebView;)V [access_flags=public static] @ 0x5f0
+{'@web_view': 'Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V'}
+fn_perform_code_trace
+fn_process_individual_trace_list_item
+fn_get_trace_parameters
+fn_enumerate_trace_source_sinks
+fn_trace_through_code
+fn_get_trace_type
+fn_get_trace_type
+fn_get_trace_items
+fn_get_trace_items
+trace_from_list
+['Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V WITH Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V']
+fn_trace_handler
+code_analyser_trace:fn_trace_handler
+['Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V WITH Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V']
+<method>
+fn_trace_handler:for loop 1
+Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V WITH Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+fn_determine_class_method_desc_with
+Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V
+inner class: Ljalee/tech/webview/WebViewActivity2;->onCreate(Landroid/os/Bundle;)V
+0:custom_check_recursive:Ljalee/tech/webview/WebViewActivity2;->onCreate(Landroid/os/Bundle;)V
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity2;->setContentView(I)V
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity2;->getIntent()Landroid/content/Intent;
+1:custom_check_recursive:Landroid/os/Bundle;->getString(Ljava/lang/String;)Ljava/lang/String;
+1:custom_check_recursive:Ljalee/tech/webview/LinkHandler;->LoadWebPage(Ljava/lang/String;Landroid/webkit/WebView;)V
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity2;->findViewById(I)Landroid/view/View;
+1:custom_check_recursive:Landroid/content/Intent;->getExtras()Landroid/os/Bundle;
+1:custom_check_recursive:Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V
+1:custom_check_recursive:Landroidx/appcompat/app/AppCompatActivity;->onCreate(Landroid/os/Bundle;)V
+inner class: Ljalee/tech/webview/WebViewHandler;->SetJavascriptInterface(Ljava/lang/Object;)V
+0:custom_check_recursive:Ljalee/tech/webview/WebViewHandler;->SetJavascriptInterface(Ljava/lang/Object;)V
+1:custom_check_recursive:Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V
+inner class: Ljalee/tech/webview/WebViewActivity;->onCreate(Landroid/os/Bundle;)V
+0:custom_check_recursive:Ljalee/tech/webview/WebViewActivity;->onCreate(Landroid/os/Bundle;)V
+1:custom_check_recursive:Landroid/os/Bundle;->getString(Ljava/lang/String;)Ljava/lang/String;
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity;->getIntent()Landroid/content/Intent;
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity;->setContentView(I)V
+1:custom_check_recursive:Ljalee/tech/webview/WebViewActivity;->findViewById(I)Landroid/view/View;
+1:custom_check_recursive:Ljalee/tech/webview/WebViewHandler;-><init>(Landroid/webkit/WebView;)V
+2:custom_check_recursive:Ljava/lang/Object;-><init>()V
+1:custom_check_recursive:Landroid/content/Intent;->getExtras()Landroid/os/Bundle;
+1:custom_check_recursive:Ljalee/tech/webview/WebViewHandler;->RedirectUrl(Ljava/lang/String;)V
+2:custom_check_recursive:Ljalee/tech/webview/LinkHandler;->LoadWebPage(Ljava/lang/String;Landroid/webkit/WebView;)V
+1:custom_check_recursive:Ljalee/tech/webview/WebViewHandler;->SetJavascriptInterface(Ljava/lang/Object;)V
+2:custom_check_recursive:Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V
+1:custom_check_recursive:Landroidx/appcompat/app/AppCompatActivity;->onCreate(Landroid/os/Bundle;)V
+end
+Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V
+fn_trace_reverse
+tracechain: Ljalee/tech/webview/Util;->mSetupJavascriptInterface(Ljava/lang/Object;Landroid/webkit/WebView;)V WITH Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V

@@ -161,10 +161,11 @@ class AnalysisUtils:
         """
         method_objs = []
         if desc_part != '.':
-            desc_part = re.escape(desc_part)
+            desc_part = re.escape(self.format_desc_part(desc_part))
         class_part = re.escape(class_part)
         method_part = re.escape(method_part)
-        
+    
+
         for method in self.androguard_dx.find_methods(
             class_part,
             method_part,
@@ -172,6 +173,13 @@ class AnalysisUtils:
         ):
             method_objs.append(method)
         return method_objs
+
+    def format_desc_part(self, desc_part):
+        desc_part = desc_part.replace(';', '; ')
+        part = desc_part.split(')')
+        x = [y.strip() for y in part]
+        desc_part = ")".join(x)
+        return desc_part
         
     def fn_get_calls_to_method(self, class_part, method_part, desc_part):
         """Gets all methods that call a method of interest.
@@ -507,6 +515,7 @@ class AnalysisUtils:
         :returns: updated links object (dictionary)
         """
         for return_object in current_returns:
+            print(return_object)
             for object_key in return_object:
                 return_value = return_object[object_key]
                 # Links are identified by @.

@@ -94,7 +94,7 @@ class CodeSearch:
                 )
 
         self.fn_reset()
-        
+
         # Return the outcome and the links, to be used by next code segment.
         return [bool_satisfied, self.current_links]
         
@@ -647,8 +647,10 @@ class CodeSearch:
         :param return_candidates: list of EncodedMethod objects to process 
             according to the rules specified in the return_object
         """
+        print("fn_analyse_returns")
         # Returnable items.
         returnables = return_object['RETURN']
+        print(returnables)
         # Generalise the returnables to a list.
         if type(returnables) is list:
             returnable_elements = returnables
@@ -656,12 +658,18 @@ class CodeSearch:
             returnable_elements = returnables.split(',')
         else:
             returnable_elements = [returnables]
-            
+
+        print(returnable_elements)
+
         # Process each returnable item.
         for return_element in returnable_elements:
+            #print(returnable_element_name)
             returnable_element_name = return_element.split(' AS ')[1]
             return_type = return_element.split(' AS ')[0]
+            print(return_type)
+            print(returnable_element_name)
             for return_candidate in return_candidates:
+                print(return_candidate)
                 self.fn_process_returnable_item(
                     return_candidate,
                     return_type,

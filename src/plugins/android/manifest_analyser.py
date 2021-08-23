@@ -115,6 +115,7 @@ class ManifestAnalyser:
                         self.current_links
                     )
 
+        #print(self.current_links)
         # Return a boolean indicating whether manifest requirements were
         #  satisfied, and the links.
         return [
@@ -340,6 +341,7 @@ class ManifestAnalyser:
 
         # Finally, check if all expected lookfor elements were satisfied.
         if expected_lookfors == satisfied_lookfors:
+            print("All lookfor elements were satisfied")
             return True
         else:
             return False
@@ -380,11 +382,17 @@ class ManifestAnalyser:
         for tag in all_tags:
             all_tag_variants.append(self.fn_generate_namespace_variants(tag))
 
+        print(current_xml_tree.attrib)
         # Check for the presence of each tag. If even one is satisfied,
         #  return True (because it's an OR operator).
         for tag_name in all_tag_variants:
-            if tag_name in current_xml_tree.attrib:
-                return True
+            if type(tag_name) == list:
+                for item in tag_name:
+                    if item in current_xml_tree.attrib:
+                        return True
+            else:
+                if tag_name in current_xml_tree.attrib:
+                        return True
         return False
         
     def fn_analyse_tag_not_exists(self, lookfor_string, current_xml_tree):
